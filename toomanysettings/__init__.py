@@ -102,7 +102,7 @@ class YAMLLoader(SettingsLoader):
                 "YAMLLoader requires the yaml module to work. Consider installing it."
             ) from ex
         with open(self._fp, mode="r") as f:
-            content = yaml.load(f)
+            content = yaml.safe_load(f)
             if not isinstance(content, dict):
                 raise Exception("Only objects are supported.")
             return content
