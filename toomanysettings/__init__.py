@@ -89,6 +89,25 @@ class TOMLLoader(SettingsLoader):
             return content
 
 
+class YAMLLoader(SettingsLoader):
+    def __init__(self, fp: str) -> None:
+        super().__init__()
+        self._fp = fp
+
+    def load(self) -> dict[str, typing.Any]:
+        try:
+            import yaml
+        except ImportError as ex:
+            raise Exception(
+                "YAMLLoader requires the yaml module to work. Consider installing it."
+            ) from ex
+        with open(self._fp, mode="r") as f:
+            content = yaml.load(f)
+            if not isinstance(content, dict):
+                raise Exception("Only objects are supported.")
+            return content
+
+
 class EnvLoader(typing.Generic[TSettings], SettingsLoader):
     def __init__(self, *, model: type[TSettings], prefix: str = "") -> None:
         self._model = model
