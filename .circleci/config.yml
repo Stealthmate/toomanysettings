@@ -1,0 +1,29 @@
+version: 2.1
+
+jobs:
+  pre-commit:
+    docker:
+      - image: python:3.10
+    steps:
+      - checkout
+      - run:
+          name: install pre-commit
+          command: pip3 install pre-commit
+      - restore_cache:
+          name: pre-commit
+          keys:
+            - pre-commit-{{ checksum ".pre-commit-config.yaml" }}
+            - pre-commit-
+      - run:
+          name: pre-commit
+          command: pre-commit run --all-files --verbose
+      - save_cache:
+          name: pre-commit
+          key: pre-commit-{{ checksum ".pre-commit-config.yaml" }}
+          paths:
+            - /root/.cache/pre-commit
+
+workflows:
+  default:
+    jobs:
+      - pre-commit
