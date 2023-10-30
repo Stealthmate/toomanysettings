@@ -1,30 +1,23 @@
-
 import pydantic
-import typing
 
-from toomanysettings import Settings, DictLoader
+from toomanysettings import DictLoader, Settings
+
 
 class OtherSettings(pydantic.BaseModel):
-    foo: str = 'f'
+    foo: str = "f"
     bar: str
+
 
 class SomeSettings(pydantic.BaseModel):
     x: str
-    y: str = 'foo'
+    y: str = "foo"
     z: OtherSettings
+
 
 def test_ok() -> None:
     s = Settings(
-        model=SomeSettings,
-        loaders=[
-            DictLoader(
-                x='x',
-                z=dict(
-                    bar='bar'
-                )
-            )
-        ]
+        model=SomeSettings, loaders=[DictLoader(x="x", z=dict(bar="bar"))]
     ).settings
 
-    assert 'x' == s.x
-    assert OtherSettings(bar='bar') == s.z
+    assert "x" == s.x
+    assert OtherSettings(bar="bar") == s.z

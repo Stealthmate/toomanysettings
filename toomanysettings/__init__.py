@@ -1,17 +1,22 @@
 import abc
-import typing
 import json
+import typing
+
 import pydantic
 
 TSettings = typing.TypeVar("TSettings", bound=pydantic.BaseModel)
+
 
 class SettingsLoader(abc.ABC):
     @abc.abstractmethod
     def load(self) -> dict[str, typing.Any]:
         raise NotImplementedError()
 
+
 class Settings(typing.Generic[TSettings]):
-    def __init__(self, *, model: type[TSettings], loaders: typing.Iterable[SettingsLoader]) -> None:
+    def __init__(
+        self, *, model: type[TSettings], loaders: typing.Iterable[SettingsLoader]
+    ) -> None:
         self._loaders = loaders
         self._model = model
 
@@ -41,6 +46,7 @@ class Settings(typing.Generic[TSettings]):
 
         return self.merge_dicts(merged_head, *tail)
 
+
 class DictLoader(SettingsLoader):
     def __init__(self, **values: typing.Any) -> None:
         super().__init__()
@@ -49,17 +55,19 @@ class DictLoader(SettingsLoader):
     def load(self) -> dict[str, typing.Any]:
         return self._values
 
+
 class JSONLoader(SettingsLoader):
     def __init__(self, fp: str) -> None:
         super().__init__()
         self._fp = fp
 
     def load(self) -> dict[str, typing.Any]:
-        with open(self._fp, mode='r') as f:
+        with open(self._fp, mode="r") as f:
             content = json.load(f)
             if not isinstance(content, dict):
-                raise Exception('Only objects are supported.')
+                raise Exception("Only objects are supported.")
             return content
+
 
 class TOMLLoader(SettingsLoader):
     def __init__(self, fp: str) -> None:
@@ -70,9 +78,11 @@ class TOMLLoader(SettingsLoader):
         try:
             import toml
         except ImportError as ex:
-            raise Exception('TOMLLoader requires the toml module to work. Consider installing it.') from ex
-        with open(self._fp, mode='r') as f:
+            raise Exception(
+                "TOMLLoader requires the toml module to work. Consider installing it."
+            ) from ex
+        with open(self._fp, mode="r") as f:
             content = toml.load(f)
             if not isinstance(content, dict):
-                raise Exception('Only objects are supported.')
+                raise Exception("Only objects are supported.")
             return content
