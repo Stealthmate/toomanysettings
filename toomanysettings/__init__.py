@@ -1,5 +1,6 @@
 import abc
 import json
+import os
 import typing
 
 import pydantic
@@ -86,3 +87,29 @@ class TOMLLoader(SettingsLoader):
             if not isinstance(content, dict):
                 raise Exception("Only objects are supported.")
             return content
+
+
+class EnvLoader(typing.Generic[TSettings], SettingsLoader):
+    def __init__(self, *, model: type[TSettings], prefix: str = "") -> None:
+        self._model = model
+        self._prefix = prefix
+
+    def load(self) -> dict[str, typing.Any]:
+        return self.load_with_prefix(self._prefix, self._model)
+
+    def load_with_prefix(
+        self, prefix: str, model: type[pydantic.BaseModel]
+    ) -> dict[str, typing.Any]:
+        result: dict[str, typing.Any] = {}
+        for field, field_info in model.model_fields.items():
+            env_var_name = f"{prefix}_{field}"
+            if field_info.annotation is not None and issubclass(
+                field_info.annotation, pydantic.BaseModel
+            ):
+                result[field] = self.load_with_prefix(
+                    env_var_name, field_info.annotation
+                )
+            value = os.environ.get(env_var_name, None)
+            if value is not None:
+                result[field] = value
+        return result
