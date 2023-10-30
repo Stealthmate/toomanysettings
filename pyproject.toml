@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "toomanysettings"
+version = "0.1.0"
+description = ""
+authors = ["stealthmate <stealthmate1233@gmail.com>"]
+readme = "README.md"
+packages = [{include = "toomanysettings"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = "^2.3.0"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.6.1"
+pytest = "^7.4.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
