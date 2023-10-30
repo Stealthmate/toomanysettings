@@ -60,3 +60,19 @@ class JSONLoader(SettingsLoader):
             if not isinstance(content, dict):
                 raise Exception('Only objects are supported.')
             return content
+
+class TOMLLoader(SettingsLoader):
+    def __init__(self, fp: str) -> None:
+        super().__init__()
+        self._fp = fp
+
+    def load(self) -> dict[str, typing.Any]:
+        try:
+            import toml
+        except ImportError as ex:
+            raise Exception('TOMLLoader requires the toml module to work. Consider installing it.') from ex
+        with open(self._fp, mode='r') as f:
+            content = toml.load(f)
+            if not isinstance(content, dict):
+                raise Exception('Only objects are supported.')
+            return content

@@ -9,10 +9,15 @@ packages = [{include = "toomanysettings"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 pydantic = "^2.3.0"
+toml = { version = "^0.10.2", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.6.1"
 pytest = "^7.4.3"
+types-toml = "^0.10.8.7"
+
+[tool.poetry.extras]
+toml = ["toml"]
 
 [build-system]
 requires = ["poetry-core"]
