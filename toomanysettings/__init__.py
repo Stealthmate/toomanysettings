@@ -134,7 +134,7 @@ class EnvLoader(typing.Generic[TSettings], SettingsLoader):
         return result
 
 
-class HVACLoader(SettingsLoader):
+class HVACKVLoader(SettingsLoader):
     def __init__(
         self,
         url: str,
@@ -145,25 +145,30 @@ class HVACLoader(SettingsLoader):
         cert: typing.Optional[typing.Tuple[str, str]] = None,
         verify: typing.Optional[bool] = None,
     ) -> None:
-        try:
-            import hvac
-        except ImportError as ex:
-            raise Exception(
-                "HVACLoader requires the hvac module to work. Consider installing it."
-            ) from ex
-        self._client = hvac.Client(
-            url=url,
-            token=token,
-            cert=cert,
-            verify=verify,
-        )
+        self._url = (url,)
+        self._token = (token,)
+        self._cert = (cert,)
         self._path = path
         self._mount_point = mount_point
         self._version = version
+        self._verify = verify
 
     def load(self) -> dict[str, typing.Any]:
         if self._version not in ["v1", "v2"]:
             raise Exception("Only v1 and v2 are allowed as versions.")
+
+        try:
+            import hvac
+        except ImportError as ex:
+            raise Exception(
+                "HVACKVLoader requires the hvac module to work. Consider installing it."
+            ) from ex
+        self._client = hvac.Client(
+            url=self._url,
+            token=self._token,
+            cert=self._cert,
+            verify=self._verify,
+        )
 
         if self._version == "v2":
             secret = self._client.secrets.kv.v2.read_secret_version(
