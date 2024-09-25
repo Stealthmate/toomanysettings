@@ -7,6 +7,19 @@ import pydantic
 
 TSettings = typing.TypeVar("TSettings", bound=pydantic.BaseModel)
 
+class UNSET:
+    pass
+
+class SettingsModel(pydantic.BaseModel):
+    @pydantic.model_validator(mode='before')
+    def missing_to_unset(cls, data: typing.Any) -> typing.Any:
+        for field, field_info in cls.model_fields.items():
+            if field_info.default is not None or field_info.default_factory is not None:
+                continue
+            if field not in data:
+                data[field] = UNSET
+        return data
+
 
 class SettingsLoader(abc.ABC):
     @abc.abstractmethod

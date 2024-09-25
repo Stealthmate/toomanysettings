@@ -2,18 +2,18 @@ import os
 
 import pydantic
 
-from toomanysettings import DictLoader, EnvLoader, Settings
+from toomanysettings import DictLoader, EnvLoader, Settings, SettingsModel, UNSET
 
 
-class OtherSettings(pydantic.BaseModel):
-    foo: str = "f"
-    bar: str
+class OtherSettings(SettingsModel):
+    foo: str | UNSET = "f"
+    bar: str | UNSET
 
 
-class SomeSettings(pydantic.BaseModel):
-    x: str
-    y: str = "foo"
-    z: OtherSettings
+class SomeSettings(SettingsModel):
+    x: str | UNSET
+    y: str | UNSET = "foo"
+    z: OtherSettings | UNSET
 
 
 def test_ok() -> None:
